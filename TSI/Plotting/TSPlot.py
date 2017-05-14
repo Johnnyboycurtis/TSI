@@ -35,7 +35,7 @@ plt.plot(mat)
 
 
 def plotTS(vals, xlabel="time", ylabel="values", title="Time Series", xlim=None, ylim=None):
-    if isinstance(vals, pd.Series) or isinstance(vals, pd.DataFrame):
+    if not isinstance(vals, pd.Series) or not isinstance(vals, pd.DataFrame):
         vals = pd.DataFrame(vals)
     ax = vals.plot()
     ax.set_xlabel("time")

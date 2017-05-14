@@ -9,7 +9,7 @@ Created on Sat May  6 16:45:37 2017
 import numpy as np
 
 
-def blockBootstrap(x, b = 4, samples=1000, func=None):
+def blockBootstrap(x, b = 4, seriesSamples=10, func=None):
     """
     Block Bootstrapping function
     x: a numpy array
@@ -21,26 +21,30 @@ def blockBootstrap(x, b = 4, samples=1000, func=None):
     Simply pass a function to `func`
     """
     n = len(x)
+    nBlocks = (n/b) + 1 ## calculate how many blocks will it take to create 
+    ## one series; we add one extra block at the end
+    blockSamples = nBlocks*seriesSamples ## then calculate how many blocks are needed
+    ## to create however many samples are requested
     diff = n - (b+1)
     blocks = {}
-    z = int(n/b)
+    #z = int(n/b)
     for i in range(diff):
         block = x[i:(b+i)]
         blocks[i] = block
-    ind = np.random.randint(low = 0, high = diff, size=samples)
+    ind = np.random.randint(low = 0, high = diff, size=blockSamples)
     samples = [blocks[i] for i in ind]
     samples = np.array(samples)
-    r = samples.shape[0]
     ## diff = r - z
     results = []
-    for i in range((r-z)):
-        temp = samples[i:(z+i),:]
-        if i < 5:
-            print temp
+
+    for i in range(seriesSamples): #range((r-nBlocks)):
+        temp = samples[i:(nBlocks+i),:]
+        if i < 3: ## debugging
+            print temp ## debugging
         j,k = temp.shape
         temp = temp.reshape((j*k,))
         results.append(temp)
-        if i < 5:
+        if i < 3: ## debugging
             print temp
     results = np.array(results) ## turns list of arrays to martrix
     if func:
@@ -69,11 +73,13 @@ def naBoot(x, windowSize = 4, samples = 1000):
 ## test 1:
 vals = range(20)
 n = len(vals)
-b = 4
+b = 3
 diff = n - (b+1)
 z = int(n/b)
+Blocks = []
 for i in range(diff):
     block = vals[i:(b+i)]
+    Blocks.append(block)
     print i,block
 
 out = blockBootstrap(vals)
