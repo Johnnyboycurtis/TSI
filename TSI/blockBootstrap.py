@@ -7,6 +7,7 @@ Created on Sat May  6 16:45:37 2017
 """
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def blockBootstrap(x, b = 4, seriesSamples=10, func=None):
@@ -40,12 +41,13 @@ def blockBootstrap(x, b = 4, seriesSamples=10, func=None):
     for i in range(seriesSamples): #range((r-nBlocks)):
         temp = samples[i:(nBlocks+i),:]
         if i < 3: ## debugging
-            print temp ## debugging
+            print i, temp ## debugging
         j,k = temp.shape
         temp = temp.reshape((j*k,))
+        temp = temp[:n]
         results.append(temp)
         if i < 3: ## debugging
-            print temp
+            print i, temp
     results = np.array(results) ## turns list of arrays to martrix
     if func:
         results = map(func, results)
@@ -54,14 +56,26 @@ def blockBootstrap(x, b = 4, seriesSamples=10, func=None):
 
 
 
+
+
+
+
+
+
 def naBoot(x, windowSize = 4, samples = 1000):
     """
     Uses block bootstrapping to calculate imputation values
+    
+    x: a numpy array of values with missing values
+    windowSize: window size for block bootstrap sampling
+    samples: how many bootstrapped time series should be used for imputation?
+    
+    returns an a complete time series as a numpy array
     """
     k = windowSize
     missing = np.isnan(x)
     where = np.where(missing)
-    tsSamples = blockBootstrap(x)
+    tsSamples = blockBootstrap(x, windowSize, samples)
     for i in np.nditer(where):
         vals = [row[(i-k):(i+k)] for row in tsSamples]
         est = [np.nanmean(y) for y in vals]
@@ -107,4 +121,32 @@ temp[10] = np.nan
 test = naBoot(temp)
     
     
+
+
+
+## test 2:
+s = np.random.randn(20).cumsum()
+test = s.copy()
+test[4] = np.nan
+test[15:17] = np.nan
+plt.plot(s)
+plt.plot(test)
+
+
+
+hopefultest = naBoot(test)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
