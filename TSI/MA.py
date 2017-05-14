@@ -7,11 +7,11 @@ Created on Sat May  6 15:18:39 2017
 """
 
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import numpy as np
 
 
-def MA(x, windowSize = 4, kind = 'mean'):
+def MA(x, windowSize = 4, kind = 'mean', addNoise=False):
     """
     Uses a moving average to fill in missing values
     x: an univariate time series
@@ -27,9 +27,16 @@ def MA(x, windowSize = 4, kind = 'mean'):
     k = windowSize
     missing = np.isnan(x)
     where = np.where(missing)
+    if addNoise:
+        mu = np.nanmean(x)
+        sd = np.nanstd(x)
+        
     for i in np.nditer(where):
         #print(type(i), i)
         vals = x[(i-k):(i+k)]
+        if addNoise:
+            noise = np.random.normal(mu,sd,1)
+            vals += noise
         #print(vals)
         impute = func(vals)
         #print(impute)
